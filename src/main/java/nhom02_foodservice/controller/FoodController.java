@@ -1,5 +1,8 @@
 package nhom02_foodservice.controller;
 
+import lombok.AllArgsConstructor;
+import nhom02_foodservice.dtos.requests.FoodCreateRequest;
+import nhom02_foodservice.dtos.requests.FoodUpdateRequest;
 import nhom02_foodservice.entity.Food;
 import nhom02_foodservice.service.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +12,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/foods")
+@AllArgsConstructor
 public class FoodController {
-
-    @Autowired
-    private FoodService service;
+    private final FoodService service;
 
     // 1. Lấy danh sách tất cả món ăn
     @GetMapping
@@ -22,17 +24,14 @@ public class FoodController {
 
     // 2. Thêm một món ăn mới
     @PostMapping
-    public Food createFood(@RequestBody Food food) {
-        return service.save(food);
+    public Food createFood(@RequestBody FoodCreateRequest request) {
+        return service.save(request);
     }
 
     // 3. Cập nhật thông tin món ăn
     @PutMapping("/{id}")
-    public Food updateFood(@PathVariable Long id, @RequestBody Food foodDetails) {
-        Food food = service.findById(id);
-        food.setName(foodDetails.getName());
-        food.setPrice(foodDetails.getPrice());
-        return service.save(food);
+    public Food updateFood(@PathVariable Long id, @RequestBody FoodUpdateRequest request) {
+        return service.updateFood(id, request);
     }
 
     // 4. Xóa món ăn
