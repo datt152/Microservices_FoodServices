@@ -1,0 +1,39 @@
+resilience4j:
+  # 1. Cấu hình Circuit Breaker (Ngắt mạch)
+  circuitbreaker:
+    instances:
+      foodService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5              # Chỉ theo dõi 5 request gần nhất
+        minimumNumberOfCalls: 3           # Vừa đủ 3 request là bắt đầu tính toán tỷ lệ lỗi
+        failureRateThreshold: 50          # Lỗi > 50% là ngắt mạch ngay
+        waitDurationInOpenState: 20s      # Mở mạch (OPEN) trong 20 giây để bạn kịp quan sát
+        permittedNumberOfCallsInHalfOpenState: 3 # Cho phép 3 request thử nghiệm khi ở trạng thái HALF_OPEN
+
+  # 2. Cấu hình Retry (Thử lại)
+  retry:
+    instances:
+      foodService:
+        maxAttempts: 3                     # Thử tối đa 3 lần (bao gồm cả lần gọi đầu tiên)
+        waitDuration: 2s                   # Thời gian chờ giữa các lần retry
+  # 3. Cấu hình Rate Limiter (Giới hạn tốc độ)
+  ratelimiter:
+    instances:
+      foodService:
+        limitForPeriod: 5                 # Cho phép tối đa 5 request
+        limitRefreshPeriod: 10s             # Reset bộ đếm mỗi 10 giây
+        timeoutDuration: 0s                # Nếu vượt quá giới hạn, từ chối ngay lập tức (0s chờ)
+        registerHealthIndicator: true
+
+# Bật endpoint Actuator để theo dõi trạng thái
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, circuitbreakers, circuitbreakerevents

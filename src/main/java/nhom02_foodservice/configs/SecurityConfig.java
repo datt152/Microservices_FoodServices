@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cấu hình các API công khai (nếu có)
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         // Yêu cầu token cho mọi API còn lại
                         .anyRequest().authenticated()
                 )
